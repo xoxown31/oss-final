@@ -48,72 +48,70 @@ const AddRecordPage = () => {
   };
 
   return (
-    <Layout>
-      <Wrapper>
-        <Header>
-          <h1>Add a New Record</h1>
-          <p>Search for a book and add your thoughts.</p>
-        </Header>
-        
-        {!selectedBook ? (
-          <BookSearch onBookSelect={handleBookSelect} />
-        ) : (
-          <Form onSubmit={handleSubmit}>
-            <SelectedBook>
-              <CoverImage src={selectedBook.coverImage} alt={selectedBook.title} />
-              <div>
-                <h2>{selectedBook.title}</h2>
-                <p>{selectedBook.author}</p>
-              </div>
-            </SelectedBook>
-            
-            <FormSection>
-              <label>How would you rate it?</label>
-              <StarRating rating={rating} onRate={setRating} />
-            </FormSection>
+    <Wrapper>
+      <Header>
+        <h1>Add a New Record</h1>
+        <p>Search for a book and add your thoughts.</p>
+      </Header>
+      
+      {!selectedBook ? (
+        <BookSearch onBookSelect={handleBookSelect} />
+      ) : (
+        <Form onSubmit={handleSubmit}>
+          <SelectedBook>
+            <CoverImage src={selectedBook.coverImage} alt={selectedBook.title} />
+            <div>
+              <h2>{selectedBook.title}</h2>
+              <p>{selectedBook.author}</p>
+            </div>
+          </SelectedBook>
+          
+          <FormSection>
+            <label>How would you rate it?</label>
+            <StarRating rating={rating} onRate={setRating} />
+          </FormSection>
 
+          <FormSection>
+            <label htmlFor="notes">Your thoughts</label>
+            <TextArea
+              id="notes"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="What did you think of this book?"
+              rows="4"
+            />
+          </FormSection>
+
+          <DateFields>
             <FormSection>
-              <label htmlFor="notes">Your thoughts</label>
-              <TextArea
-                id="notes"
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="What did you think of this book?"
-                rows="4"
+              <label htmlFor="startDate">Start Date</label>
+              <Input
+                type="date"
+                id="startDate"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
               />
             </FormSection>
-
-            <DateFields>
-              <FormSection>
-                <label htmlFor="startDate">Start Date</label>
-                <Input
-                  type="date"
-                  id="startDate"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                />
-              </FormSection>
-              <FormSection>
-                <label htmlFor="endDate">End Date</label>
-                <Input
-                  type="date"
-                  id="endDate"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                />
-              </FormSection>
-            </DateFields>
-            
-            <ButtonContainer>
-              <Button type="submit" primary>Save Record</Button>
-              <Button type="button" onClick={() => setSelectedBook(null)}>
-                Choose a different book
-              </Button>
-            </ButtonContainer>
-          </Form>
-        )}
-      </Wrapper>
-    </Layout>
+            <FormSection>
+              <label htmlFor="endDate">End Date</label>
+              <Input
+                type="date"
+                id="endDate"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+              />
+            </FormSection>
+          </DateFields>
+          
+          <ButtonContainer>
+            <Button type="submit" primary>Save Record</Button>
+            <Button type="button" onClick={() => setSelectedBook(null)}>
+              Choose a different book
+            </Button>
+          </ButtonContainer>
+        </Form>
+      )}
+    </Wrapper>
   );
 };
 

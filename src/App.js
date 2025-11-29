@@ -2,6 +2,7 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { AnimatePresence } from 'framer-motion';
 import ProtectedRoute from './components/ProtectedRoute';
+import AppLayout from './components/AppLayout';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import AddRecordPage from './pages/AddRecordPage';
@@ -18,30 +19,13 @@ function App() {
         <Routes location={location} key={location.pathname}>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <DashboardPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/add-record"
-            element={
-              <ProtectedRoute>
-                <AddRecordPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/record/:id"
-            element={
-              <ProtectedRoute>
-                <RecordPage />
-              </ProtectedRoute>
-            }
-          />
+          
+          <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+            <Route path="/" element={<DashboardPage />} />
+            <Route path="/add-record" element={<AddRecordPage />} />
+            <Route path="/record/:id" element={<RecordPage />} />
+            <Route path="/community" element={<div>Community Page Coming Soon!</div>} />
+          </Route>
         </Routes>
       </AnimatePresence>
     </AuthProvider>

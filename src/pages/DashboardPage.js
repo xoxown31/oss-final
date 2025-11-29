@@ -65,7 +65,7 @@ const DashboardPage = () => {
   const chartData = useMemo(() => processChartData(records), [records]);
 
   return (
-    <Layout>
+    <>
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -106,7 +106,7 @@ const DashboardPage = () => {
         </DashboardWrapper>
       </motion.div>
       <FloatingActionButton to="/add-record">+</FloatingActionButton>
-    </Layout>
+    </>
   );
 };
 

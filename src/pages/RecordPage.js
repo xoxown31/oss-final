@@ -58,68 +58,66 @@ const RecordPage = () => {
   };
 
   if (!record) {
-    return <Layout><LoadingSpinner /></Layout>;
+    return <LoadingSpinner />;
   }
 
   return (
-    <Layout>
-      <Wrapper>
-        <Header>
-          <CoverImage src={record.coverImage} alt={record.title} />
-          <Info>
-            <h1>{record.title}</h1>
-            <p>{record.author}</p>
-            <p>{record.publisher}</p>
-          </Info>
-        </Header>
-        
-        {isEditing ? (
-          <Form onSubmit={handleUpdate}>
-            <FormSection>
-                <label>Rating</label>
-                <StarRating rating={rating} onRate={setRating} />
-            </FormSection>
-            <FormSection>
-                <label>Notes</label>
-                <TextArea value={notes} onChange={e => setNotes(e.target.value)} rows="5" />
-            </FormSection>
-            <DateFields>
-                <FormSection>
-                    <label>Start Date</label>
-                    <Input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} />
-                </FormSection>
-                <FormSection>
-                    <label>End Date</label>
-                    <Input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
-                </FormSection>
-            </DateFields>
-            <ButtonContainer>
-                <Button primary type="submit">Save Changes</Button>
-                <Button type="button" onClick={() => setIsEditing(false)}>Cancel</Button>
-            </ButtonContainer>
-          </Form>
-        ) : (
-          <Details>
-            <DetailItem>
-                <h3>Rating</h3>
-                <StarRating rating={record.userRating} onRate={() => {}} />
-            </DetailItem>
-            <DetailItem>
-                <h3>Notes</h3>
-                <Notes>{record.notes || 'No notes added.'}</Notes>
-            </DetailItem>
-            <DetailItem>
-                <h3>Dates Read</h3>
-                <p>{record.startDate} to {record.endDate}</p>
-            </DetailItem>
-            <ButtonContainer>
-                <Button primary onClick={() => setIsEditing(true)}>Edit</Button>
-                <Button onClick={handleDelete}>Delete</Button>
-            </ButtonContainer>
-          </Details>
-        )}
-      </Wrapper>
-    </Layout>
+    <Wrapper>
+      <Header>
+        <CoverImage src={record.coverImage} alt={record.title} />
+        <Info>
+          <h1>{record.title}</h1>
+          <p>{record.author}</p>
+          <p>{record.publisher}</p>
+        </Info>
+      </Header>
+      
+      {isEditing ? (
+        <Form onSubmit={handleUpdate}>
+          <FormSection>
+              <label>Rating</label>
+              <StarRating rating={rating} onRate={setRating} />
+          </FormSection>
+          <FormSection>
+              <label>Notes</label>
+              <TextArea value={notes} onChange={e => setNotes(e.target.value)} rows="5" />
+          </FormSection>
+          <DateFields>
+              <FormSection>
+                  <label>Start Date</label>
+                  <Input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} />
+              </FormSection>
+              <FormSection>
+                  <label>End Date</label>
+                  <Input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
+              </FormSection>
+          </DateFields>
+          <ButtonContainer>
+              <Button primary type="submit">Save Changes</Button>
+              <Button type="button" onClick={() => setIsEditing(false)}>Cancel</Button>
+          </ButtonContainer>
+        </Form>
+      ) : (
+        <Details>
+          <DetailItem>
+              <h3>Rating</h3>
+              <StarRating rating={record.userRating} onRate={() => {}} />
+          </DetailItem>
+          <DetailItem>
+              <h3>Notes</h3>
+              <Notes>{record.notes || 'No notes added.'}</Notes>
+          </DetailItem>
+          <DetailItem>
+              <h3>Dates Read</h3>
+              <p>{record.startDate} to {record.endDate}</p>
+          </DetailItem>
+          <ButtonContainer>
+              <Button primary onClick={() => setIsEditing(true)}>Edit</Button>
+              <Button onClick={handleDelete}>Delete</Button>
+          </ButtonContainer>
+        </Details>
+      )}
+    </Wrapper>
   );
 };
 
