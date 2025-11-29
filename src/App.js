@@ -1,20 +1,55 @@
-import "./App.css";
-import CreateUser from "./components/User/CreateUser";
-import ShowUser from "./components/User/ShowUser";
-import { Route, Routes } from "react-router-dom";
-import EditUser from "./components/User/EditUser";
-import User from "./components/User/User";
-import Header from "./components/Common/Header";
-import Home from "./components/Layout/Home";
+import { Routes, Route, useLocation } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
+import { AnimatePresence } from 'framer-motion';
+import ProtectedRoute from './components/ProtectedRoute';
+import LoginPage from './pages/LoginPage';
+import DashboardPage from './pages/DashboardPage';
+import AddRecordPage from './pages/AddRecordPage';
+import RecordPage from './pages/RecordPage';
+import './App.css';
+
 function App() {
+  const location = useLocation();
+
   return (
-    <div className="App">
-      <header className="container">
-        <div className="">
-        </div>
-      </header>
-    </div>
+    <AuthProvider>
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/add-record"
+            element={
+              <ProtectedRoute>
+                <AddRecordPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/record/:id"
+            element={
+              <ProtectedRoute>
+                <RecordPage />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </AnimatePresence>
+    </AuthProvider>
   );
 }
 
 export default App;
+
+
+
+
+
+
