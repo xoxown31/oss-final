@@ -23,11 +23,22 @@ const mockApi = axios.create({
 // User Authentication
 export const register = async (username, password) => {
   try {
+    // Check if username already exists
+    const response = await mockApi.get('/users');
+    const existingUser = response.data.find(
+      (u) => u.username.toLowerCase() === username.toLowerCase()
+    );
+
+    if (existingUser) {
+      throw new Error('Username already exists');
+    }
+
+    // If not, create new user
     const newUser = { username, password };
-    const response = await mockApi.post('/users', newUser);
-    return response.data;
+    const createResponse = await mockApi.post('/users', newUser);
+    return createResponse.data;
   } catch (error) {
-    console.error('Registration API failed:', error);
+    console.error('Registration API failed:', error.message);
     throw error;
   }
 };

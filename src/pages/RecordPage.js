@@ -33,6 +33,13 @@ const RecordPage = () => {
 
   const handleUpdate = async (e) => {
     e.preventDefault();
+    
+    // Date validation
+    if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+      alert('The end date cannot be earlier than the start date.');
+      return;
+    }
+
     const updatedData = {
       userRating: rating,
       notes,

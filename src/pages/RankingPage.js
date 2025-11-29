@@ -1,8 +1,8 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getPublicRecords } from '../api';
+import { generateDemoData } from '../api/demoData';
 import LoadingSpinner from '../components/LoadingSpinner';
 import RankingList from '../components/RankingList';
 
@@ -40,18 +40,16 @@ const calculateRankings = (records) => {
 
   const allBooks = Object.values(books);
 
-  // --- Bayesian Average Calculation for Top Rated ---
-  const C = totalRatingsCount > 0 ? totalRatingsSum / totalRatingsCount : 3; // Global average rating
-  const m = 2; // Minimum ratings required to be listed
+  const C = totalRatingsCount > 0 ? totalRatingsSum / totalRatingsCount : 3;
+  const m = 2;
 
   allBooks.forEach(book => {
-    const R = book.ratings.reduce((a, b) => a + b, 0) / book.ratings.length; // Average rating for this book
-    const v = book.ratings.length; // Number of ratings for this book
+    const R = book.ratings.reduce((a, b) => a + b, 0) / book.ratings.length;
+    const v = book.ratings.length;
     
     book.averageRating = R;
     book.adjustedScore = (v / (v + m)) * R + (m / (v + m)) * C;
   });
-  // --- End of Bayesian Average Calculation ---
 
   const hot = [...allBooks].sort((a, b) => b.hotScore - a.hotScore).slice(0, 10);
   const mostRead = [...allBooks].sort((a, b) => b.readCount - a.readCount).slice(0, 10);
@@ -63,13 +61,14 @@ const calculateRankings = (records) => {
   return { hot, mostRead, topRated };
 };
 
-
 const RankingPage = () => {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [activeTab, setActiveTab] = useState('hot');
 
-  useEffect(() => {
+  const fetchAndSetRecords = () => {
+    setLoading(true);
     getPublicRecords()
       .then(data => {
         setRecords(data);
@@ -79,15 +78,36 @@ const RankingPage = () => {
         console.error(err);
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    fetchAndSetRecords();
   }, []);
+
+  const handleGenerateData = async () => {
+    setIsGenerating(true);
+    const result = await generateDemoData();
+    if (result.success) {
+      alert('Demo data generation complete! The rankings will now refresh.');
+      fetchAndSetRecords(); // Re-fetch data to update the view
+    } else {
+      alert('Failed to generate demo data. Please check the console.');
+    }
+    setIsGenerating(false);
+  };
 
   const rankings = useMemo(() => calculateRankings(records), [records]);
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
       <Header>
-        <h1>Community Rankings</h1>
-        <p>Discover books that are popular, highly-rated, and trending now.</p>
+        <div>
+          <h1>Community Rankings</h1>
+          <p>Discover books that are popular, highly-rated, and trending now.</p>
+        </div>
+        <GenerateButton onClick={handleGenerateData} disabled={isGenerating}>
+          {isGenerating ? 'Generating...' : 'Generate Demo Data'}
+        </GenerateButton>
       </Header>
       
       <Tabs>
@@ -116,9 +136,29 @@ const RankingPage = () => {
 };
 
 const Header = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   margin-bottom: ${({ theme }) => theme.spacing.xlarge};
   h1 { font-size: 2.5rem; font-weight: bold; color: ${({ theme }) => theme.colors.primary}; }
   p { font-size: 1.2rem; color: ${({ theme }) => theme.colors.gray}; }
+`;
+
+const GenerateButton = styled.button`
+  padding: ${({ theme }) => theme.spacing.medium} ${({ theme }) => theme.spacing.large};
+  background-color: ${({ theme }) => theme.colors.secondary};
+  color: white;
+  border: none;
+  border-radius: ${({ theme }) => theme.borderRadius};
+  font-size: 1rem;
+  font-weight: bold;
+  box-shadow: ${({ theme }) => theme.shadows.small};
+  cursor: pointer;
+  
+  &:disabled {
+    background-color: ${({ theme }) => theme.colors.gray};
+    cursor: not-allowed;
+  }
 `;
 
 const Tabs = styled.div`
@@ -132,10 +172,11 @@ const TabButton = styled.button`
   font-size: 1.1rem;
   font-weight: bold;
   border-radius: ${({ theme }) => theme.borderRadius};
-  border: 2px solid ${({ theme, active }) => (active ? theme.colors.primary : 'transparent')};
+  border: 2px solid transparent;
   background-color: ${({ theme, active }) => (active ? theme.colors.primary + '22' : theme.colors.card)};
   color: ${({ theme, active }) => (active ? theme.colors.primary : theme.colors.text)};
   box-shadow: ${({ theme }) => theme.shadows.small};
+  cursor: pointer;
   
   &:hover {
     background-color: ${({ theme }) => theme.colors.primary}22;

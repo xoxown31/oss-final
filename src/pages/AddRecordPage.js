@@ -3,10 +3,10 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { createRecord } from '../api';
-import Layout from '../components/Layout';
+import { createRecord, getRecords } from '../api';
 import BookSearch from '../components/BookSearch';
 import StarRating from '../components/StarRating';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 const AddRecordPage = () => {
   const [selectedBook, setSelectedBook] = useState(null);
@@ -15,21 +15,49 @@ const AddRecordPage = () => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [isPublic, setIsPublic] = useState(false);
+  const [isChecking, setIsChecking] = useState(false);
   
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const handleBookSelect = (book) => {
-    setSelectedBook({
-      title: book.title.replace(/<[^>]+>/g, ''),
-      author: book.author.replace(/<[^>]+>/g, ''),
-      coverImage: book.image,
-      publisher: book.publisher,
-    });
+  const handleBookSelect = async (book) => {
+    setIsChecking(true);
+    const bookTitle = book.title.replace(/<[^>]+>/g, '');
+    const bookAuthor = book.author.replace(/<[^>]+>/g, '');
+
+    try {
+      const userRecords = await getRecords(user.id);
+      const existingRecord = userRecords.find(r => r.title === bookTitle && r.author === bookAuthor);
+
+      if (existingRecord) {
+        alert('You have already recorded this book. Redirecting to the existing record.');
+        navigate(`/record/${existingRecord.id}`);
+        return;
+      }
+
+      setSelectedBook({
+        title: bookTitle,
+        author: bookAuthor,
+        coverImage: book.image,
+        publisher: book.publisher,
+      });
+    } catch (error) {
+      console.error("Error checking for existing records:", error);
+      alert("An error occurred while checking for existing records.");
+    } finally {
+      setIsChecking(false);
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Date validation
+    if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+      alert('The end date cannot be earlier than the start date.');
+      return;
+    }
+
     const newRecord = {
       userId: user.id,
       username: user.username,
@@ -48,6 +76,10 @@ const AddRecordPage = () => {
       console.error('Failed to create record:', error);
     }
   };
+
+  if (isChecking) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <Wrapper>
