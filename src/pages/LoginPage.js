@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'framer-motion';
@@ -14,6 +14,7 @@ const LoginPage = () => {
   const location = useLocation();
 
   const from = location.state?.from?.pathname || '/';
+  const registrationMessage = location.state?.message;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -35,22 +36,26 @@ const LoginPage = () => {
       <LoginForm onSubmit={handleSubmit}>
         <Title>Bookend</Title>
         <Subtitle>Sign in to continue</Subtitle>
+        {registrationMessage && <SuccessMessage>{registrationMessage}</SuccessMessage>}
         {error && <ErrorMessage>{error}</ErrorMessage>}
         <Input
           type="text"
-          placeholder="Username (try 'testuser')"
+          placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           required
         />
         <Input
           type="password"
-          placeholder="Password (try 'password123')"
+          placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
         />
         <Button type="submit">Login</Button>
+        <SignUpLink>
+          Don't have an account? <Link to="/register">Sign Up</Link>
+        </SignUpLink>
       </LoginForm>
     </LoginWrapper>
   );
@@ -119,6 +124,29 @@ const ErrorMessage = styled.p`
   color: ${({ theme }) => theme.colors.accent};
   margin-bottom: ${({ theme }) => theme.spacing.medium};
   font-size: 0.9rem;
+`;
+
+const SuccessMessage = styled.p`
+  color: #28a745;
+  margin-bottom: ${({ theme }) => theme.spacing.medium};
+  font-size: 0.9rem;
+  font-weight: bold;
+`;
+
+const SignUpLink = styled.p`
+  margin-top: ${({ theme }) => theme.spacing.large};
+  color: ${({ theme }) => theme.colors.gray};
+  font-size: 0.9rem;
+
+  a {
+    color: ${({ theme }) => theme.colors.primary};
+    font-weight: bold;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 `;
 
 export default LoginPage;

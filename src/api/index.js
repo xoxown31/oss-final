@@ -21,6 +21,17 @@ const mockApi = axios.create({
 // --- Live API Functions ---
 
 // User Authentication
+export const register = async (username, password) => {
+  try {
+    const newUser = { username, password };
+    const response = await mockApi.post('/users', newUser);
+    return response.data;
+  } catch (error) {
+    console.error('Registration API failed:', error);
+    throw error;
+  }
+};
+
 export const login = async (username, password) => {
   try {
     const response = await mockApi.get('/users');
