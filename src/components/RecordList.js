@@ -1,33 +1,11 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
-import { getRecords } from '../api';
-import { useAuth } from '../contexts/AuthContext';
 import RecordItem from './RecordItem';
 import LoadingSpinner from './LoadingSpinner';
 import { Link } from 'react-router-dom';
 
-const RecordList = () => {
-  const [records, setRecords] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
-
-  useEffect(() => {
-    const fetchRecords = async () => {
-      setLoading(true);
-      try {
-        const data = await getRecords(user.id);
-        setRecords(data);
-      } catch (error) {
-        console.error('Failed to fetch records:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchRecords();
-  }, [user.id]);
-
+const RecordList = ({ records, loading }) => {
   if (loading) {
     return <LoadingSpinner />;
   }
@@ -35,7 +13,7 @@ const RecordList = () => {
   return (
     <ListContainer>
       <h2>Your Records</h2>
-      {records.length > 0 ? (
+      {records && records.length > 0 ? (
         <List>
           {records.map((record) => (
             <RecordItem key={record.id} record={record} />
