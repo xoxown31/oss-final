@@ -12,9 +12,14 @@ const calculateRankings = (records) => {
   }
 
   const books = {};
+  let totalRatingsSum = 0;
+  let totalRatingsCount = 0;
 
   records.forEach(record => {
-    const identifier = record.title + record.author; // Simple identifier
+    totalRatingsSum += record.userRating;
+    totalRatingsCount++;
+
+    const identifier = record.title + record.author;
     if (!books[identifier]) {
       books[identifier] = {
         title: record.title,
@@ -29,22 +34,31 @@ const calculateRankings = (records) => {
     book.readCount++;
     book.ratings.push(record.userRating);
 
-    // Calculate hot score
     const ageInDays = (new Date() - new Date(record.createdAt)) / (1000 * 3600 * 24);
-    book.hotScore += 1 / (ageInDays + 2); // Recency decay
+    book.hotScore += 1 / (ageInDays + 2);
   });
 
   const allBooks = Object.values(books);
 
-  // Calculate average ratings
+  // --- Bayesian Average Calculation for Top Rated ---
+  const C = totalRatingsCount > 0 ? totalRatingsSum / totalRatingsCount : 3; // Global average rating
+  const m = 2; // Minimum ratings required to be listed
+
   allBooks.forEach(book => {
-    const sum = book.ratings.reduce((a, b) => a + b, 0);
-    book.averageRating = sum / book.ratings.length;
+    const R = book.ratings.reduce((a, b) => a + b, 0) / book.ratings.length; // Average rating for this book
+    const v = book.ratings.length; // Number of ratings for this book
+    
+    book.averageRating = R;
+    book.adjustedScore = (v / (v + m)) * R + (m / (v + m)) * C;
   });
+  // --- End of Bayesian Average Calculation ---
 
   const hot = [...allBooks].sort((a, b) => b.hotScore - a.hotScore).slice(0, 10);
   const mostRead = [...allBooks].sort((a, b) => b.readCount - a.readCount).slice(0, 10);
-  const topRated = [...allBooks].filter(b => b.ratings.length > 1).sort((a, b) => b.averageRating - a.averageRating).slice(0, 10);
+  const topRated = [...allBooks]
+    .filter(b => b.ratings.length >= m)
+    .sort((a, b) => b.adjustedScore - a.adjustedScore)
+    .slice(0, 10);
 
   return { hot, mostRead, topRated };
 };
