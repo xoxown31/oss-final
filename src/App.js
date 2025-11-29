@@ -10,6 +10,7 @@ import RecordPage from './pages/RecordPage';
 import RegisterPage from './pages/RegisterPage';
 import './App.css';
 
+import RankingPage from './pages/RankingPage';
 import CommunityPage from './pages/CommunityPage';
 
 // ... other imports
@@ -29,6 +30,7 @@ function App() {
             <Route path="/add-record" element={<AddRecordPage />} />
             <Route path="/record/:id" element={<RecordPage />} />
             <Route path="/community" element={<CommunityPage />} />
+            <Route path="/ranking" element={<RankingPage />} />
           </Route>
         </Routes>
       </AnimatePresence>
