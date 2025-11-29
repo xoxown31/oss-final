@@ -82,6 +82,16 @@ export const createRecord = async (newRecord) => {
   }
 };
 
+export const getPublicRecords = async () => {
+  try {
+    const response = await mockApi.get('/readingRecords', { params: { isPublic: true } });
+    return response.data;
+  } catch (error) {
+    console.error('Get Public Records API failed:', error);
+    throw error;
+  }
+};
+
 export const updateRecord = async (recordId, updatedData) => {
   try {
     const response = await mockApi.put(`/readingRecords/${recordId}`, updatedData);

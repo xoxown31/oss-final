@@ -10,6 +10,10 @@ import RecordPage from './pages/RecordPage';
 import RegisterPage from './pages/RegisterPage';
 import './App.css';
 
+import CommunityPage from './pages/CommunityPage';
+
+// ... other imports
+
 function App() {
   const location = useLocation();
 
@@ -24,7 +28,7 @@ function App() {
             <Route path="/" element={<DashboardPage />} />
             <Route path="/add-record" element={<AddRecordPage />} />
             <Route path="/record/:id" element={<RecordPage />} />
-            <Route path="/community" element={<div>Community Page Coming Soon!</div>} />
+            <Route path="/community" element={<CommunityPage />} />
           </Route>
         </Routes>
       </AnimatePresence>

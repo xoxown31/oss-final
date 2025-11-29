@@ -14,6 +14,7 @@ const AddRecordPage = () => {
   const [notes, setNotes] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [isPublic, setIsPublic] = useState(false);
   
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -31,11 +32,13 @@ const AddRecordPage = () => {
     e.preventDefault();
     const newRecord = {
       userId: user.id,
+      username: user.username,
       ...selectedBook,
       userRating: rating,
       notes,
       startDate,
       endDate,
+      isPublic,
     };
 
     try {
@@ -43,7 +46,6 @@ const AddRecordPage = () => {
       navigate('/');
     } catch (error) {
       console.error('Failed to create record:', error);
-      // You could show an error message to the user here
     }
   };
 
@@ -103,6 +105,16 @@ const AddRecordPage = () => {
             </FormSection>
           </DateFields>
           
+          <FormSection>
+            <ToggleWrapper>
+              <label htmlFor="isPublic">Share with Community</label>
+              <ToggleSwitch>
+                <input type="checkbox" id="isPublic" checked={isPublic} onChange={(e) => setIsPublic(e.target.checked)} />
+                <span className="slider round"></span>
+              </ToggleSwitch>
+            </ToggleWrapper>
+          </FormSection>
+
           <ButtonContainer>
             <Button type="submit" primary>Save Record</Button>
             <Button type="button" onClick={() => setSelectedBook(null)}>
@@ -221,6 +233,66 @@ const Button = styled.button`
   &:hover {
     background-color: ${({ theme, primary }) => (primary ? theme.colors.secondary : theme.colors.primary)};
     color: ${({ theme }) => theme.colors.white};
+  }
+`;
+
+const ToggleWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: ${({ theme }) => theme.spacing.medium};
+  background-color: ${({ theme }) => theme.colors.background};
+  border-radius: ${({ theme }) => theme.borderRadius};
+`;
+
+const ToggleSwitch = styled.label`
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+
+  input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+  }
+
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+  }
+
+  input:checked + .slider {
+    background-color: ${({ theme }) => theme.colors.primary};
+  }
+
+  input:checked + .slider:before {
+    transform: translateX(26px);
+  }
+
+  .slider.round {
+    border-radius: 34px;
+  }
+
+  .slider.round:before {
+    border-radius: 50%;
   }
 `;
 

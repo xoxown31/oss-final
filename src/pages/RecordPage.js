@@ -18,6 +18,7 @@ const RecordPage = () => {
   const [notes, setNotes] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [isPublic, setIsPublic] = useState(false);
 
   useEffect(() => {
     getRecord(id).then(data => {
@@ -26,6 +27,7 @@ const RecordPage = () => {
       setNotes(data.notes);
       setStartDate(data.startDate);
       setEndDate(data.endDate);
+      setIsPublic(data.isPublic || false);
     });
   }, [id]);
 
@@ -36,6 +38,7 @@ const RecordPage = () => {
       notes,
       startDate,
       endDate,
+      isPublic,
     };
     try {
       const updated = await updateRecord(id, updatedData);
@@ -92,6 +95,15 @@ const RecordPage = () => {
                   <Input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
               </FormSection>
           </DateFields>
+          <FormSection>
+            <ToggleWrapper>
+              <label htmlFor="isPublic">Share with Community</label>
+              <ToggleSwitch>
+                <input type="checkbox" id="isPublic" checked={isPublic} onChange={(e) => setIsPublic(e.target.checked)} />
+                <span className="slider round"></span>
+              </ToggleSwitch>
+            </ToggleWrapper>
+          </FormSection>
           <ButtonContainer>
               <Button primary type="submit">Save Changes</Button>
               <Button type="button" onClick={() => setIsEditing(false)}>Cancel</Button>
@@ -227,6 +239,66 @@ const Button = styled.button`
 
   &:hover {
     opacity: 0.9;
+  }
+`;
+
+const ToggleWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: ${({ theme }) => theme.spacing.medium};
+  background-color: ${({ theme }) => theme.colors.background};
+  border-radius: ${({ theme }) => theme.borderRadius};
+`;
+
+const ToggleSwitch = styled.label`
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+
+  input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+  }
+
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+  }
+
+  input:checked + .slider {
+    background-color: ${({ theme }) => theme.colors.primary};
+  }
+
+  input:checked + .slider:before {
+    transform: translateX(26px);
+  }
+
+  .slider.round {
+    border-radius: 34px;
+  }
+
+  .slider.round:before {
+    border-radius: 50%;
   }
 `;
 
