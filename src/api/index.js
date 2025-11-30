@@ -67,9 +67,13 @@ export const updateUser = async (userid, userData) => {
 export const getRecords = async (userid) => {
   try {
     // mockapi.io supports filtering via search params
+    console.log(`Fetching records for user ID: ${userid}`);
     const response = await mockApi.get(`/readingRecords`, { params: { userid } });
     return response.data;
   } catch (error) {
+    if (error.response && error.response.status === 404) {
+      return []; 
+    }
     console.error('Get Records API failed:', error);
     throw error;
   }

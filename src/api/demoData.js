@@ -1,5 +1,6 @@
+// src/api/demoData.js
 
-import { register, createRecord } from './index';
+import { register, createRecord, updateUser } from './index'; // updateUser 추가
 
 // --- Data from Naver API (provided by user) ---
 const naverBookData = [
@@ -14,9 +15,24 @@ const naverBookData = [
 
 // --- Curated Persona & Review Data ---
 const personas = {
-  'alice': { username: 'alice', password: 'password123', isNewUser: false },
-  'bob': { username: 'bob', password: 'password123', isNewUser: false },
-  'charlie': { username: 'charlie', password: 'password123', isNewUser: true },
+  'alice': { 
+    username: 'alice', 
+    password: 'password123', 
+    isNewUser: false, 
+    profileImageUrl: 'https://api.dicebear.com/9.x/avataaars/svg?seed=Alice' 
+  },
+  'bob': { 
+    username: 'bob', 
+    password: 'password123', 
+    isNewUser: false, 
+    profileImageUrl: 'https://api.dicebear.com/9.x/avataaars/svg?seed=Bob' 
+  },
+  'charlie': { 
+    username: 'charlie', 
+    password: 'password123', 
+    isNewUser: true, 
+    profileImageUrl: 'https://api.dicebear.com/9.x/avataaars/svg?seed=Charlie' 
+  },
 };
 
 const curatedReviews = [
@@ -43,7 +59,17 @@ export const generateDemoData = async () => {
     const createdUsers = await Promise.all(userCreationPromises);
     console.log(`${createdUsers.length} users created.`);
     
-    const userIdMap = createdUsers.reduce((acc, user) => {
+    const userUpdatePromises = createdUsers.map(user => {
+        const persona = Object.values(personas).find(p => p.username === user.username);
+        if (persona && persona.profileImageUrl) {
+            return updateUser(user.id, { profileImageUrl: persona.profileImageUrl });
+        }
+        return Promise.resolve(user);
+    });
+    await Promise.all(userUpdatePromises);
+    console.log('User profiles updated with images.');
+
+    const useridMap = createdUsers.reduce((acc, user) => {
       acc[user.username] = user.id;
       return acc;
     }, {});
@@ -55,8 +81,9 @@ export const generateDemoData = async () => {
       if (!bookData) return null;
 
       const fullRecord = {
-        userId: userIdMap[review.user],
+        userid: useridMap[review.user],
         username: review.user,
+        userProfileImageUrl: personas[review.user].profileImageUrl,
         title: bookData.title,
         author: bookData.author,
         coverImage: bookData.image,
