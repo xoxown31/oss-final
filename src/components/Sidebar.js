@@ -85,11 +85,13 @@ const Sidebar = () => {
         gap: ${({ theme }) => theme.spacing.medium};
       `;
       
+      /*
       const DevToolsSection = styled.div`
         margin-top: auto;
         padding-top: ${({ theme }) => theme.spacing.large};
         border-top: 1px solid ${({ theme }) => theme.colors.gray}33;
       `;
+      */
       
       const StyledNavLink = styled(NavLink)`
         display: flex;

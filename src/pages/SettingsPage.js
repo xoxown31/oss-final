@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useAuth } from '../contexts/AuthContext';
-import { updateUser, updateReadingRecordsProfileImage } from '../api';
+import { updateReadingRecordsProfileImage } from '../api';
 import { motion } from 'framer-motion';
 import { DEFAULT_PROFILE_IMAGE_URL } from '../constants';
 
