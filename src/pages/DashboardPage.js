@@ -12,7 +12,7 @@ import {
 } from 'recharts';
 import { motion } from 'framer-motion';
 import { FaBook, FaStar, FaSearch } from 'react-icons/fa';
-import { getRecords } from '../api';
+import { getRecords, updateUser } from '../api';
 import { useAuth } from '../contexts/AuthContext';
 import StatCard from '../components/StatCard';
 import RecordList from '../components/RecordList';
@@ -47,7 +47,7 @@ const processChartData = (records) => {
 };
 
 const DashboardPage = () => {
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -71,6 +71,19 @@ const DashboardPage = () => {
     };
     fetchData();
   }, [user.id, user.isNewUser]);
+
+  const handleCloseTutorial = async () => {
+    setShowTutorial(false);
+    
+    if (user?.isNewUser) {
+      try {
+        await updateUser(user.id, { isNewUser: false });
+        setUser(prev => ({ ...prev, isNewUser: false }));
+      } catch (error) {
+        console.error("Failed to update user status", error);
+      }
+    }
+  };
 
   const filteredRecords = useMemo(() => {
     if (!debouncedSearchTerm) return records;
@@ -150,7 +163,10 @@ const DashboardPage = () => {
       </RecordsSection>
 
       <FloatingActionButton />
-      {showTutorial && <TutorialModal onClose={() => setShowTutorial(false)} />}
+      <TutorialModal
+        show={showTutorial}
+        onClose={handleCloseTutorial}
+      />
     </Wrapper>
   );
 };
