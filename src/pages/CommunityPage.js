@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
@@ -18,12 +17,15 @@ const CommunityPage = () => {
 
   useEffect(() => {
     // Re-fetch public records when the current user's ID changes
-    // This assumes that a profile image update for the current user
-    // will eventually be reflected in the 'user' object in AuthContext.
-    // If not, a more direct event/refetching mechanism would be needed.
     getPublicRecords()
       .then(data => {
-        setPublicRecords(data);
+        const sortedData = data.sort((a, b) => {
+          const dateA = new Date(a.createdAt);
+          const dateB = new Date(b.createdAt);
+          return dateB - dateA;
+        });
+        
+        setPublicRecords(sortedData);
         setLoading(false);
       })
       .catch(err => {
