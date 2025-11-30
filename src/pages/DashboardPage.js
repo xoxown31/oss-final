@@ -234,14 +234,6 @@ const SearchInput = styled.input`
   font-size: 1rem;
 `;
 
-const SortSelect = styled.select`
-  padding: ${({ theme }) => theme.spacing.small} ${({ theme }) => theme.spacing.medium};
-  border-radius: ${({ theme }) => theme.borderRadius};
-  border: 1px solid ${({ theme }) => theme.colors.gray}33;
-  background: transparent;
-  font-size: 1rem;
-`;
-
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: { 

@@ -3,7 +3,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { FaTachometerAlt, FaPlus, FaUsers, FaChartLine, FaWrench, FaSignOutAlt, FaCog } from 'react-icons/fa';
+import { FaTachometerAlt, FaPlus, FaUsers, FaChartLine, FaSignOutAlt, FaCog } from 'react-icons/fa';
 
 const Sidebar = () => {
   const { logout } = useAuth();

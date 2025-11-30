@@ -26,7 +26,6 @@ const SettingsPage = () => {
       // Use the profileImageUrl from state, which might be the default if the input is empty
       const urlToSave = getValidProfileImageUrl(profileImageUrl);
 
-      const updatedUser = await updateUser(user.id, { profileImageUrl: urlToSave });
       setUser(prevUser => ({ ...prevUser, profileImageUrl: urlToSave }));
       await updateReadingRecordsProfileImage(user.id, urlToSave);
       setMessage('Profile updated successfully!');
