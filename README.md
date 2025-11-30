@@ -42,15 +42,16 @@
 
 ## 🚀 Getting Started
 
-Follow these steps to get the project running on your local machine.
+This project uses **Netlify CLI** to run the frontend and serverless functions together in a local development environment that closely mirrors production.
 
 ### Prerequisites
 
-- Node.js and npm (or yarn) installed.
+- Node.js and npm (or yarn).
+- **Netlify CLI:** You'll need to install this globally.
 - A `mockapi.io` account with two resources: `users` and `readingRecords`.
 - A Naver Developers account with API credentials for the Book Search API.
 
-### Installation & Setup
+### 1. Installation
 
 1.  **Clone the repository:**
     ```sh
@@ -58,27 +59,59 @@ Follow these steps to get the project running on your local machine.
     cd <repository-folder>
     ```
 
-2.  **Install dependencies:**
+2.  **Install project dependencies:**
     ```sh
     npm install
     ```
 
-3.  **Set up environment variables:**
-    Create a file named `.env.local` in the root of your project and add your Naver API credentials:
-    ```
-    REACT_APP_NAVER_CLIENT_ID=your_naver_client_id
-    REACT_APP_NAVER_CLIENT_SECRET=your_naver_client_secret
-    ```
-    Replace the placeholder values with your actual keys.
-
-4.  **Verify mockapi.io setup:**
-    Ensure the API functions in `src/api/index.js` point to your correct `mockapi.io` project URL. The `readingRecords` resource needs an `isPublic` (Boolean) field, and the `users` resource needs an `isNewUser` (Boolean) field.
-
-5.  **Run the development server:**
+3.  **Install and configure the Netlify CLI:**
     ```sh
-    npm start
+    # Install the CLI globally
+    npm install -g netlify-cli
+
+    # Log in to your Netlify account
+    netlify login
     ```
-    The application will open at `http://localhost:3000`.
+
+### 2. Environment Variables
+
+This project requires API keys to function. They are managed differently for local development and the live deployed site.
+
+#### For Local Development
+
+1.  Create a file named `.env` in the root of the project.
+2.  Add your API keys to this file. **Note:** The `REACT_APP_` prefix is no longer used.
+
+    ```
+    # .env file
+    NAVER_CLIENT_ID=your_local_naver_client_id
+    NAVER_CLIENT_SECRET=your_local_naver_client_secret
+    ```
+    The `.env` file is listed in `.gitignore` and will not be committed.
+
+#### For Production (Live Site)
+
+Your secret keys must be set in the Netlify UI to be available to the live serverless function.
+
+1.  Go to your project's dashboard on the Netlify website.
+2.  Navigate to `Site configuration` > `Build & deploy` > `Environment variables`.
+3.  Add two variables:
+    - `NAVER_CLIENT_ID`: Your Naver Client ID.
+    - `NAVER_CLIENT_SECRET`: Your Naver Client Secret.
+
+### 3. Running the Project Locally
+
+Instead of `npm start`, use the `netlify dev` command. This will start the React app and run your serverless functions at the same time.
+
+```sh
+netlify dev
+```
+
+The application will open at a local URL (e.g., `http://localhost:8888`).
+
+### 4. Mock API Setup
+
+Ensure the API functions in `src/api/index.js` point to your correct `mockapi.io` project URL. The `readingRecords` resource needs an `isPublic` (Boolean) field, and the `users` resource needs an `isNewUser` (Boolean) field for all features to work correctly.
 
 ---
 This project was built to fulfill the requirements of the 2025-2 Open Source Studio course.
