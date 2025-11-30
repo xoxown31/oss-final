@@ -23,6 +23,7 @@ import useDebounce from '../hooks/useDebounce';
 
 const processChartData = (records) => {
   if (!records || records.length === 0) return [];
+  
   const monthlyCounts = records.reduce((acc, record) => {
     if (record.endDate) {
       const month = new Date(record.endDate).toLocaleString('en-US', { month: 'short' });
@@ -30,13 +31,19 @@ const processChartData = (records) => {
     }
     return acc;
   }, {});
+
   const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  const lastSixMonths = Array.from({ length: 6 }, (_, i) => {
+  
+  const lastEightMonths = Array.from({ length: 8 }, (_, i) => {
     const d = new Date();
     d.setMonth(d.getMonth() - i);
     return monthNames[d.getMonth()];
   }).reverse();
-  return lastSixMonths.map(month => ({ month, books: monthlyCounts[month] || 0 }));
+
+  return lastEightMonths.map(month => ({
+    name: month,
+    count: monthlyCounts[month] || 0
+  }));
 };
 
 const DashboardPage = () => {
@@ -75,7 +82,7 @@ const DashboardPage = () => {
 
   const stats = useMemo(() => {
     const totalBooks = records.length;
-    const totalPages = records.reduce((acc, r) => acc + (r.pageCount || 0), 0); // pageCount가 있다면
+    const totalPages = records.reduce((acc, r) => acc + (r.pageCount || 0), 0);
     const averageRating = totalBooks > 0 
       ? (records.reduce((acc, r) => acc + r.userRating, 0) / totalBooks).toFixed(1) 
       : 0;

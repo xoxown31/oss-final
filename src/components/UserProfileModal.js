@@ -92,7 +92,7 @@ const CloseButton = styled.button`
 const overlayVariants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { duration: 0.3 } },
-  exit: { opacity: 0, transition: { duration: 0.3, delay: 0.1 } } // 컨텐츠보다 약간 늦게 사라짐
+  exit: { opacity: 0, transition: { duration: 0.3, delay: 0.1 } }
 };
 
 const modalVariants = {
@@ -120,7 +120,7 @@ const modalVariants = {
 };
 
 const UserProfileModal = ({ user, onClose }) => {
-  const [stats, setStats] = useState({ readCount: 0, reviewCount: 0 });
+  const [stats, setStats] = useState({ readCount: 0, averageRating: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -131,14 +131,15 @@ const UserProfileModal = ({ user, onClose }) => {
           const records = await getRecords(user.id);
           
           const readCount = records.length;
-          const reviewCount = records.filter(
-            (r) => r.notes && r.notes.trim().length > 0
-          ).length;
+          const totalRating = records.reduce((acc, r) => acc + (r.userRating || 0), 0);
+          const averageRating = readCount > 0 
+            ? (totalRating / readCount).toFixed(1)
+            : 0;
 
-          setStats({ readCount, reviewCount });
+          setStats({ readCount, averageRating });
         } catch (error) {
           console.error("Failed to fetch user stats:", error);
-          setStats({ readCount: 0, reviewCount: 0 });
+          setStats({ readCount: 0, averageRating: 0 });
         } finally {
           setLoading(false);
         }
@@ -182,7 +183,7 @@ const UserProfileModal = ({ user, onClose }) => {
           ) : (
             <>
               <StatItem>
-                <StatValue>{stats.reviewCount}</StatValue>
+                <StatValue>{stats.averageRating}</StatValue>
                 <StatLabel>Review</StatLabel>
               </StatItem>
               <StatItem>

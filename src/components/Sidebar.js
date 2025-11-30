@@ -131,6 +131,10 @@ const Sidebar = () => {
           background-color: ${({ theme }) => theme.colors.accent}22;
           color: ${({ theme }) => theme.colors.accent};
         }
+
+        margin-top: auto;
+        padding-top: ${({ theme }) => theme.spacing.large};
+        border-top: 1px solid ${({ theme }) => theme.colors.gray}33;
       `;
 
 
