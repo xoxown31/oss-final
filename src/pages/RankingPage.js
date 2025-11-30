@@ -121,23 +121,6 @@ const Header = styled.div`
   p { font-size: 1.2rem; color: ${({ theme }) => theme.colors.gray}; }
 `;
 
-const GenerateButton = styled.button`
-  padding: ${({ theme }) => theme.spacing.medium} ${({ theme }) => theme.spacing.large};
-  background-color: ${({ theme }) => theme.colors.secondary};
-  color: white;
-  border: none;
-  border-radius: ${({ theme }) => theme.borderRadius};
-  font-size: 1rem;
-  font-weight: bold;
-  box-shadow: ${({ theme }) => theme.shadows.small};
-  cursor: pointer;
-  
-  &:disabled {
-    background-color: ${({ theme }) => theme.colors.gray};
-    cursor: not-allowed;
-  }
-`;
-
 const Tabs = styled.div`
   display: flex;
   gap: ${({ theme }) => theme.spacing.medium};

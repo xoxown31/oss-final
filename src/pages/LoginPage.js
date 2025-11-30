@@ -3,7 +3,6 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import styled, { keyframes } from 'styled-components';
 import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'framer-motion';
-import theme from '../styles/theme';
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
