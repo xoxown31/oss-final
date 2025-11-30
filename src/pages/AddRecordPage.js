@@ -7,6 +7,14 @@ import { createRecord, getRecords } from '../api';
 import BookSearch from '../components/BookSearch';
 import StarRating from '../components/StarRating';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { DEFAULT_PROFILE_IMAGE_URL } from '../constants';
+
+// Helper function to validate and get profile image URL
+const getValidProfileImageUrl = (url) => {
+  return url && (url.startsWith('http') || url.startsWith('https'))
+    ? url
+    : DEFAULT_PROFILE_IMAGE_URL;
+};
 
 const AddRecordPage = () => {
   const [selectedBook, setSelectedBook] = useState(null);
@@ -59,8 +67,9 @@ const AddRecordPage = () => {
     }
 
     const newRecord = {
-      userId: user.id,
+      userid: user.id, // Changed from userId to userid
       username: user.username,
+      userProfileImageUrl: getValidProfileImageUrl(user.profileImageUrl),
       ...selectedBook,
       userRating: rating,
       notes,

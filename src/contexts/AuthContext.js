@@ -17,6 +17,15 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
+  // Effect to keep localStorage in sync with the user state
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem('bookend-user', JSON.stringify(user));
+    } else {
+      localStorage.removeItem('bookend-user');
+    }
+  }, [user]);
+
   const login = async (username, password) => {
     try {
       const userData = await apiLogin(username, password);
@@ -48,7 +57,7 @@ export const AuthProvider = ({ children }) => {
 
   const isAuthenticated = !!user;
 
-  const value = { user, isAuthenticated, login, logout, loading, dismissTutorial };
+  const value = { user, setUser, isAuthenticated, login, logout, loading, dismissTutorial };
 
   return (
     <AuthContext.Provider value={value}>

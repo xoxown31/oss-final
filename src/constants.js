@@ -1,0 +1,1 @@
+export const DEFAULT_PROFILE_IMAGE_URL = 'https://cdn-icons-png.flaticon.com/512/709/709722.png';

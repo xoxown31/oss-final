@@ -53,9 +53,9 @@ export const login = async (username, password) => {
   }
 };
 
-export const updateUser = async (userId, userData) => {
+export const updateUser = async (userid, userData) => {
   try {
-    const response = await mockApi.put(`/users/${userId}`, userData);
+    const response = await mockApi.put(`/users/${userid}`, userData);
     return response.data;
   } catch (error) {
     console.error('Update User API failed:', error);
@@ -64,10 +64,10 @@ export const updateUser = async (userId, userData) => {
 };
 
 // Reading Records - CRUD
-export const getRecords = async (userId) => {
+export const getRecords = async (userid) => {
   try {
     // mockapi.io supports filtering via search params
-    const response = await mockApi.get(`/readingRecords`, { params: { userId } });
+    const response = await mockApi.get(`/readingRecords`, { params: { userid } });
     return response.data;
   } catch (error) {
     console.error('Get Records API failed:', error);
@@ -111,6 +111,32 @@ export const updateRecord = async (recordId, updatedData) => {
     return response.data;
   } catch (error) {
     console.error('Update Record API failed:', error);
+    throw error;
+  }
+};
+
+export const updateReadingRecordsProfileImage = async (userid, newProfileImageUrl) => {
+  try {
+    console.log(`Attempting to update profile images for user ${userid} with new URL: ${newProfileImageUrl}`);
+    const userRecords = await getRecords(userid); // Use the existing getRecords function
+    console.log(`Found ${userRecords.length} records for user ${userid}.`);
+
+    const updatePromises = userRecords.map(async record => {
+      console.log(`Processing record ${record.id}: current userProfileImageUrl = ${record.userProfileImageUrl}`);
+      const updatedData = { ...record, userProfileImageUrl: newProfileImageUrl };
+      try {
+        const response = await mockApi.put(`/readingRecords/${record.id}`, updatedData);
+        console.log(`Successfully updated record ${record.id}. New userProfileImageUrl = ${response.data.userProfileImageUrl}`);
+        return response.data;
+      } catch (putError) {
+        console.error(`Failed to update record ${record.id}:`, putError);
+        throw putError; // Re-throw to ensure Promise.all rejects if any fails
+      }
+    });
+    await Promise.all(updatePromises);
+    console.log(`Completed updating profile images for ${updatePromises.length} reading records for user ${userid}.`);
+  } catch (error) {
+    console.error('Update Reading Records Profile Image API failed:', error);
     throw error;
   }
 };

@@ -3,7 +3,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { FaTachometerAlt, FaPlus, FaUsers, FaChartLine, FaWrench, FaSignOutAlt } from 'react-icons/fa';
+import { FaTachometerAlt, FaPlus, FaUsers, FaChartLine, FaWrench, FaSignOutAlt, FaCog } from 'react-icons/fa';
 
 const Sidebar = () => {
   const { logout } = useAuth();
@@ -33,6 +33,10 @@ const Sidebar = () => {
         <StyledNavLink to="/ranking">
           <FaChartLine />
           <span>Ranking</span>
+        </StyledNavLink>
+        <StyledNavLink to="/settings">
+          <FaCog />
+          <span>Settings</span>
         </StyledNavLink>
             </Nav>
       

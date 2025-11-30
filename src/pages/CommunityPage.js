@@ -4,12 +4,23 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { getPublicRecords } from '../api';
 import LoadingSpinner from '../components/LoadingSpinner';
+import UserProfileModal from '../components/UserProfileModal';
+import { DEFAULT_PROFILE_IMAGE_URL } from '../constants';
+import { useAuth } from '../contexts/AuthContext'; // Import useAuth
 
 const CommunityPage = () => {
   const [publicRecords, setPublicRecords] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+
+  const { user } = useAuth(); // Get the user from AuthContext
 
   useEffect(() => {
+    // Re-fetch public records when the current user's ID changes
+    // This assumes that a profile image update for the current user
+    // will eventually be reflected in the 'user' object in AuthContext.
+    // If not, a more direct event/refetching mechanism would be needed.
     getPublicRecords()
       .then(data => {
         setPublicRecords(data);
@@ -19,7 +30,17 @@ const CommunityPage = () => {
         console.error(err);
         setLoading(false);
       });
-  }, []);
+  }, [user?.id]); // Add user.id to the dependency array
+
+  const handleUserClick = (user) => {
+    setSelectedUser(user);
+    setIsProfileModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsProfileModalOpen(false);
+    setSelectedUser(null);
+  };
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
@@ -48,13 +69,33 @@ const CommunityPage = () => {
                 </Rating>
                 <Notes>{record.notes}</Notes>
                 <UserInfo>
-                  Shared by @{record.username || 'anonymous'}
+                  <ProfileImage
+                    src={
+                      record.userProfileImageUrl && (record.userProfileImageUrl.startsWith('http') || record.userProfileImageUrl.startsWith('https'))
+                        ? record.userProfileImageUrl
+                        : DEFAULT_PROFILE_IMAGE_URL
+                    }
+                    alt={record.username}
+                    onClick={() => handleUserClick({
+                      username: record.username,
+                      profileImageUrl: record.userProfileImageUrl && (record.userProfileImageUrl.startsWith('http') || record.userProfileImageUrl.startsWith('https'))
+                        ? record.userProfileImageUrl
+                        : DEFAULT_PROFILE_IMAGE_URL
+                    })}
+                  />
+                  Shared by <Username onClick={() => handleUserClick({
+                    username: record.username,
+                    profileImageUrl: record.userProfileImageUrl && (record.userProfileImageUrl.startsWith('http') || record.userProfileImageUrl.startsWith('https'))
+                      ? record.userProfileImageUrl
+                      : DEFAULT_PROFILE_IMAGE_URL
+                  })}>@{record.username || 'anonymous'}</Username>
                 </UserInfo>
               </CardContent>
             </Card>
           ))}
         </Grid>
       )}
+      {isProfileModalOpen && <UserProfileModal user={selectedUser} onClose={handleCloseModal} />}
     </motion.div>
   );
 };
@@ -138,6 +179,24 @@ const UserInfo = styled.div`
   border-top: 1px solid ${({ theme }) => theme.colors.gray}33;
   padding-top: ${({ theme }) => theme.spacing.small};
   margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+`;
+
+const ProfileImage = styled.img`
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: ${({ theme }) => theme.spacing.small};
+`;
+
+const Username = styled.span`
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
+  }
 `;
 
 export default CommunityPage;

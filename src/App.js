@@ -16,6 +16,7 @@ import CommunityPage from './pages/CommunityPage';
 // ... other imports
 
 import HomePage from './pages/HomePage';
+import SettingsPage from './pages/SettingsPage';
 
 import DevPage from './pages/DevPage';
 
@@ -36,6 +37,7 @@ function App() {
             <Route path="/record/:id" element={<RecordPage />} />
             <Route path="/community" element={<CommunityPage />} />
             <Route path="/ranking" element={<RankingPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
             <Route path="/dev" element={<DevPage />} />
           </Route>
         </Routes>
