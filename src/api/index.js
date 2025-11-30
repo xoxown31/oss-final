@@ -1,14 +1,6 @@
 
 import axios from 'axios';
 
-// Axios instance for Naver API via proxy
-const naverApi = axios.create({
-  baseURL: '/api', 
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
 // Axios instance for our mock API
 const mockApi = axios.create({
   baseURL: 'https://692b1a6f7615a15ff24ebcc8.mockapi.io',
@@ -137,10 +129,11 @@ export const deleteRecord = async (recordId) => {
 // Naver Book Search
 export const searchBooks = async (query) => {
   try {
-    const response = await naverApi.get('/search/book.json', {
-      params: { query, display: 10 },
+    // Call our own Netlify function endpoint
+    const response = await axios.get('/.netlify/functions/search-books', {
+      params: { query },
     });
-    return response.data.items;
+    return response.data;
   } catch (error) {
     console.error('Error searching books:', error);
     throw error;
