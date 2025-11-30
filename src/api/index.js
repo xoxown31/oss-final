@@ -21,7 +21,7 @@ const mockApi = axios.create({
 // --- Live API Functions ---
 
 // User Authentication
-export const register = async (username, password) => {
+export const register = async (username, password, isNewUser = true) => {
   try {
     // Check if username already exists
     const response = await mockApi.get('/users');
@@ -34,7 +34,7 @@ export const register = async (username, password) => {
     }
 
     // If not, create new user
-    const newUser = { username, password };
+    const newUser = { username, password, isNewUser };
     const createResponse = await mockApi.post('/users', newUser);
     return createResponse.data;
   } catch (error) {
@@ -57,6 +57,16 @@ export const login = async (username, password) => {
     }
   } catch (error) {
     console.error('Login API failed:', error);
+    throw error;
+  }
+};
+
+export const updateUser = async (userId, userData) => {
+  try {
+    const response = await mockApi.put(`/users/${userId}`, userData);
+    return response.data;
+  } catch (error) {
+    console.error('Update User API failed:', error);
     throw error;
   }
 };

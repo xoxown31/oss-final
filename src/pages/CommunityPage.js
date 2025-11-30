@@ -85,6 +85,12 @@ const Card = styled(motion.div)`
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  transition: ${({ theme }) => theme.transition};
+
+  &:hover {
+    box-shadow: ${({ theme }) => theme.shadows.medium};
+    transform: translateY(-5px);
+  }
 `;
 
 const CoverImage = styled.img`

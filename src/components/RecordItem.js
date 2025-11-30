@@ -38,14 +38,15 @@ const ItemWrapper = styled(motion.div)`
   padding: ${({ theme }) => theme.spacing.medium};
   border: 1px solid ${({ theme }) => theme.colors.gray}33;
   border-radius: ${({ theme }) => theme.borderRadius};
-  transition: box-shadow 0.2s, border-color 0.2s;
+  transition: ${({ theme }) => theme.transition};
   text-decoration: none;
   color: inherit;
 
   &:hover {
-    box-shadow: ${({ theme }) => theme.shadows.small};
-    border-color: ${({ theme }) => theme.colors.gray}66;
-    background-color: ${({ theme }) => theme.colors.background};
+    box-shadow: ${({ theme }) => theme.shadows.medium};
+    border-color: transparent;
+    transform: translateY(-5px);
+    background-color: ${({ theme }) => theme.colors.card};
   }
 `;
 

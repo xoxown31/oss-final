@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import { motion } from 'framer-motion';
 import { register } from '../api'; 
 import theme from '../styles/theme';
@@ -15,10 +14,20 @@ const RegisterPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (username.length < 4) {
+      setError('Username must be at least 4 characters long.');
+      return;
+    }
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long.');
+      return;
+    }
     if (password !== confirmPassword) {
       setError('Passwords do not match.');
       return;
     }
+
     setError('');
     try {
       await register(username, password);
@@ -64,17 +73,19 @@ const RegisterPage = () => {
           Already have an account? <Link to="/login">Log In</Link>
         </LoginLink>
       </RegisterForm>
+      <AnimatedShapes />
     </RegisterWrapper>
   );
 };
 
-// Using similar styled components from LoginPage for consistency
 const RegisterWrapper = styled(motion.div)`
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
   background: ${() => theme.colors.background};
+  position: relative;
+  overflow: hidden;
 `;
 
 const RegisterForm = styled.form`
@@ -87,6 +98,7 @@ const RegisterForm = styled.form`
   width: 100%;
   max-width: 400px;
   text-align: center;
+  z-index: 2;
 `;
 
 const Title = styled.h1`
@@ -108,6 +120,7 @@ const Input = styled.input`
   border-radius: 4px;
   font-size: 1rem;
   transition: border-color 0.2s;
+  background-color: ${({ theme }) => theme.colors.background};
 
   &:focus {
     border-color: ${() => theme.colors.primary};
@@ -130,7 +143,7 @@ const Button = styled.button`
 
 const ErrorMessage = styled.p`
   color: ${() => theme.colors.accent};
-  margin-bottom: ${() => theme.spacing.medium};
+  margin-bottom: ${({ theme }) => theme.spacing.medium};
   font-size: 0.9rem;
 `;
 
@@ -149,5 +162,27 @@ const LoginLink = styled.p`
     }
   }
 `;
+
+const move = keyframes`
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+  100% { transform: translateY(0); }
+`;
+
+const Shape = styled(motion.div)`
+  position: absolute;
+  border-radius: 50%;
+  background-color: ${({ color }) => color};
+  opacity: 0.1;
+  animation: ${move} 10s infinite ease-in-out;
+`;
+
+const AnimatedShapes = () => (
+  <>
+    <Shape color="#E84A5F" style={{ width: 200, height: 200, top: '15%', right: '10%' }} />
+    <Shape color="#9D65C9" style={{ width: 150, height: 150, bottom: '15%', left: '20%', animationDelay: '4s' }} />
+  </>
+);
+
 
 export default RegisterPage;

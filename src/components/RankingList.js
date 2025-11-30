@@ -62,9 +62,16 @@ const ListItem = styled.li`
   gap: ${({ theme }) => theme.spacing.large};
   padding: ${({ theme }) => theme.spacing.medium};
   border-radius: ${({ theme }) => theme.borderRadius};
+  transition: ${({ theme }) => theme.transition};
 
   &:nth-child(odd) {
     background-color: ${({ theme }) => theme.colors.background};
+  }
+
+  &:hover {
+    transform: translateX(10px);
+    background-color: ${({ theme }) => theme.colors.card};
+    box-shadow: ${({ theme }) => theme.shadows.medium};
   }
 `;
 

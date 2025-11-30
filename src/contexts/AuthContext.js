@@ -1,6 +1,6 @@
 
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { login as apiLogin } from '../api';
+import { login as apiLogin, updateUser } from '../api';
 
 const AuthContext = createContext(null);
 
@@ -33,9 +33,22 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const dismissTutorial = async () => {
+    if (user && user.isNewUser) {
+      try {
+        const updatedUser = { ...user, isNewUser: false };
+        await updateUser(user.id, updatedUser);
+        setUser(updatedUser);
+        localStorage.setItem('bookend-user', JSON.stringify(updatedUser));
+      } catch (error) {
+        console.error("Failed to update user's new status", error);
+      }
+    }
+  };
+
   const isAuthenticated = !!user;
 
-  const value = { user, isAuthenticated, login, logout, loading };
+  const value = { user, isAuthenticated, login, logout, loading, dismissTutorial };
 
   return (
     <AuthContext.Provider value={value}>

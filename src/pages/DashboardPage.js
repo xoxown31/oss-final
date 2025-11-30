@@ -18,6 +18,7 @@ import StatCard from '../components/StatCard';
 import RecordList from '../components/RecordList';
 import FloatingActionButton from '../components/FloatingActionButton';
 import LoadingSpinner from '../components/LoadingSpinner';
+import TutorialModal from '../components/TutorialModal';
 import useDebounce from '../hooks/useDebounce';
 
 const processChartData = (records) => {
@@ -43,8 +44,9 @@ const DashboardPage = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('endDate-desc');
-  const { user } = useAuth();
+  const { user, dismissTutorial } = useAuth();
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
+  const [showTutorial, setShowTutorial] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -57,7 +59,17 @@ const DashboardPage = () => {
         console.error(err);
         setLoading(false);
       });
-  }, [user.id]);
+    
+    // Show tutorial for new users
+    if (user && user.isNewUser) {
+      setShowTutorial(true);
+    }
+  }, [user]);
+
+  const handleCloseTutorial = () => {
+    setShowTutorial(false);
+    dismissTutorial();
+  };
 
   const { totalBooks, averageRating } = useMemo(() => {
     if (!records || records.length === 0) {
@@ -94,6 +106,7 @@ const DashboardPage = () => {
 
   return (
     <>
+      <TutorialModal show={showTutorial} onClose={handleCloseTutorial} />
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
         <StatsContainer>
           <StatCard icon={<FaBook />} title="Total Books Read" value={totalBooks} />

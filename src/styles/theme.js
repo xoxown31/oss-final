@@ -1,18 +1,18 @@
 
 const theme = {
   colors: {
-    primary: '#6C5B7B', // A muted, sophisticated purple
-    secondary: '#C06C84', // A warm, rosy accent
-    background: '#F9F7F7', // A very light, warm gray
-    text: '#353535', // A dark, soft black
+    primary: '#5D54A4',    // A deeper, more elegant purple
+    secondary: '#9D65C9',   // A brighter, complementary purple for accents
+    background: '#F1F0F7', // A very light, slightly cool gray
+    text: '#333333',       // A standard dark gray for readability
     card: '#FFFFFF',
-    accent: '#F67280', // A brighter coral for highlights and calls to action
+    accent: '#E84A5F',     // A vibrant pink/red for calls to action
     white: '#FFFFFF',
-    gray: '#A9A9A9',
+    gray: '#9E9E9E',       // A neutral gray for subtitles and borders
   },
   fonts: {
-    main: 'Georgia, serif',
-    heading: 'Garamond, serif',
+    main: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
+    heading: "'Merriweather', serif",
   },
   spacing: {
     small: '8px',
@@ -21,10 +21,11 @@ const theme = {
     xlarge: '32px',
   },
   shadows: {
-    small: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)',
-    medium: '0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)',
+    small: '0 2px 4px rgba(0,0,0,0.05)',
+    medium: '0 5px 15px rgba(0,0,0,0.08)',
   },
-  borderRadius: '8px',
+  borderRadius: '12px',
+  transition: 'all 0.3s ease-in-out',
 };
 
 export default theme;

@@ -1,76 +1,75 @@
-
 import { register, createRecord } from './index';
 
-// --- Sample Data ---
-const sampleUsers = [
-  { username: 'alice', password: 'password123' },
-  { username: 'bob', password: 'password123' },
-  { username: 'charlie', password: 'password123' },
+// --- Curated Persona & Book Data ---
+
+const personas = {
+  'alice': { username: 'alice', password: 'password123', isNewUser: false }, // Sci-Fi Lover
+  'bob': { username: 'bob', password: 'password123', isNewUser: false },     // Classics Critic
+  'charlie': { username: 'charlie', password: 'password123', isNewUser: true }, // New user for tutorial testing
+};
+
+const curatedRecords = [
+  // Alice's Sci-Fi Ratings
+  { user: 'alice', title: 'Dune', author: 'Frank Herbert', rating: 5, notes: "A masterpiece of world-building. The political intrigue is just as compelling as the sci-fi elements.", isPublic: true },
+  { user: 'alice', title: 'The Three-Body Problem', author: 'Cixin Liu', rating: 5, notes: "Mind-bending science fiction that completely changed my perspective on the genre.", isPublic: true },
+  { user: 'alice', title: 'Project Hail Mary', author: 'Andy Weir', rating: 4, notes: "Fun, witty, and incredibly smart. A great read!", isPublic: false },
+
+  // Bob's Classics Ratings
+  { user: 'bob', title: '1984', author: 'George Orwell', rating: 5, notes: "More relevant today than ever. A chilling and essential read.", isPublic: true },
+  { user: 'bob', title: 'Brave New World', author: 'Aldous Huxley', rating: 4, notes: "A fascinating dystopia, though the characters felt a bit distant. The concepts are brilliant.", isPublic: true },
+  { user: 'bob', title: 'Dune', author: 'Frank Herbert', rating: 4, notes: "An epic, but the pacing drags in the middle. Still, a monumental work.", isPublic: true }, // Duplicate book for ranking test
+  { user: 'bob', title: 'Fahrenheit 451', author: 'Ray Bradbury', rating: 3, notes: "A powerful message, but the plot felt a little thin in comparison to its contemporaries.", isPublic: true },
+  
+  // Charlie's first steps
+  { user: 'charlie', title: 'Project Hail Mary', author: 'Andy Weir', rating: 5, notes: "My first book in a while, and it was amazing! Can't wait to read more.", isPublic: true }, // Duplicate book for ranking test
 ];
 
-const sampleBooks = [
-  { title: 'Dune', author: 'Frank Herbert', coverImage: 'https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1555447414l/44767458.jpg' },
-  { title: 'The Three-Body Problem', author: 'Cixin Liu', coverImage: 'https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1415428227l/20518872.jpg' },
-  { title: 'Project Hail Mary', author: 'Andy Weir', coverImage: 'https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1597695864l/54493401.jpg' },
-  { title: '1984', author: 'George Orwell', coverImage: 'https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1532714506l/40961427.jpg' },
-  { title: 'Brave New World', author: 'Aldous Huxley', coverImage: 'https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1575509280l/5129.jpg' },
-  { title: 'Fahrenheit 451', author: 'Ray Bradbury', coverImage: 'https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1383718290l/13079982.jpg' },
-];
-
-const sampleNotes = [
-  "An absolute classic, a must-read.",
-  "Interesting concepts, but the pacing was a bit slow.",
-  "Couldn't put it down! Highly recommended.",
-  "The ending was a complete surprise.",
-  "A thought-provoking story that will stay with me.",
-  "The characters felt very real and relatable.",
-];
+const bookDetails = {
+  'Dune': { coverImage: 'https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1555447414l/44767458.jpg', publisher: 'Chilton Books' },
+  'The Three-Body Problem': { coverImage: 'https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1415428227l/20518872.jpg', publisher: 'Chongqing Press' },
+  'Project Hail Mary': { coverImage: 'https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1597695864l/54493401.jpg', publisher: 'Ballantine Books' },
+  '1984': { coverImage: 'https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1532714506l/40961427.jpg', publisher: 'Secker & Warburg' },
+  'Brave New World': { coverImage: 'https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1575509280l/5129.jpg', publisher: 'Chatto & Windus' },
+  'Fahrenheit 451': { coverImage: 'https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1383718290l/13079982.jpg', publisher: 'Ballantine Books' },
+};
 
 // --- Generator Logic ---
 
-function getRandom(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
-function getRandomDate(start, end) {
-  return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
-}
-
 export const generateDemoData = async () => {
   try {
-    console.log('--- Starting Demo Data Generation ---');
+    console.log('--- Starting Curated Demo Data Generation ---');
 
-    // 1. Create users
-    const createdUsers = await Promise.all(sampleUsers.map(u => register(u.username, u.password)));
+    // 1. Create users from personas
+    const userCreationPromises = Object.values(personas).map(p => register(p.username, p.password, p.isNewUser));
+    const createdUsers = await Promise.all(userCreationPromises);
     console.log(`${createdUsers.length} users created.`);
+    
+    // Map usernames to their new IDs
+    const userIdMap = createdUsers.reduce((acc, user) => {
+      acc[user.username] = user.id;
+      return acc;
+    }, {});
 
-    // 2. Create records
-    const recordPromises = [];
-    for (let i = 0; i < 20; i++) {
-      const user = getRandom(createdUsers);
-      const book = getRandom(sampleBooks);
-      
-      // Ensure some books get multiple reviews for ranking
-      const bookForReview = i < sampleBooks.length ? sampleBooks[i] : getRandom(sampleBooks);
-
-      const record = {
-        userId: user.id,
-        username: user.username,
-        title: bookForReview.title,
-        author: bookForReview.author,
-        coverImage: bookForReview.coverImage,
-        publisher: 'Demo Publisher',
-        userRating: Math.floor(Math.random() * 5) + 1, // 1-5 stars
-        notes: getRandom(sampleNotes),
-        startDate: getRandomDate(new Date(2023, 0, 1), new Date()).toISOString().split('T')[0],
-        endDate: getRandomDate(new Date(), new Date(2024, 11, 31)).toISOString().split('T')[0],
-        isPublic: Math.random() > 0.3, // 70% chance of being public
+    // 2. Create curated records
+    const recordPromises = curatedRecords.map((record, index) => {
+      const fullRecord = {
+        userId: userIdMap[record.user],
+        username: record.user,
+        title: record.title,
+        author: record.author,
+        coverImage: bookDetails[record.title].coverImage,
+        publisher: bookDetails[record.title].publisher,
+        userRating: record.rating,
+        notes: record.notes,
+        startDate: `2024-0${index + 1}-01`,
+        endDate: `2024-0${index + 1}-15`,
+        isPublic: record.isPublic,
       };
-      recordPromises.push(createRecord(record));
-    }
+      return createRecord(fullRecord);
+    });
 
     await Promise.all(recordPromises);
-    console.log(`${recordPromises.length} records created.`);
+    console.log(`${recordPromises.length} curated records created.`);
     console.log('--- Demo Data Generation Complete ---');
     return { success: true, message: `${createdUsers.length} users and ${recordPromises.length} records created.` };
 

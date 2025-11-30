@@ -1,9 +1,9 @@
-
 import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'framer-motion';
+import theme from '../styles/theme';
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
@@ -57,6 +57,7 @@ const LoginPage = () => {
           Don't have an account? <Link to="/register">Sign Up</Link>
         </SignUpLink>
       </LoginForm>
+      <AnimatedShapes />
     </LoginWrapper>
   );
 };
@@ -67,6 +68,8 @@ const LoginWrapper = styled(motion.div)`
   align-items: center;
   height: 100vh;
   background: ${({ theme }) => theme.colors.background};
+  position: relative;
+  overflow: hidden;
 `;
 
 const LoginForm = styled.form`
@@ -79,6 +82,7 @@ const LoginForm = styled.form`
   width: 100%;
   max-width: 400px;
   text-align: center;
+  z-index: 2;
 `;
 
 const Title = styled.h1`
@@ -100,6 +104,7 @@ const Input = styled.input`
   border-radius: 4px;
   font-size: 1rem;
   transition: border-color 0.2s;
+  background-color: ${({ theme }) => theme.colors.background};
 
   &:focus {
     border-color: ${({ theme }) => theme.colors.primary};
@@ -149,5 +154,25 @@ const SignUpLink = styled.p`
   }
 `;
 
-export default LoginPage;
+const move = keyframes`
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+  100% { transform: translateY(0); }
+`;
 
+const Shape = styled(motion.div)`
+  position: absolute;
+  border-radius: 50%;
+  background-color: ${({ color }) => color};
+  opacity: 0.1;
+  animation: ${move} 10s infinite ease-in-out;
+`;
+
+const AnimatedShapes = () => (
+  <>
+    <Shape color="#5D54A4" style={{ width: 200, height: 200, top: '10%', left: '15%' }} />
+    <Shape color="#9D65C9" style={{ width: 150, height: 150, bottom: '20%', right: '20%', animationDelay: '3s' }} />
+  </>
+);
+
+export default LoginPage;

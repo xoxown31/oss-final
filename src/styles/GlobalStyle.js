@@ -3,6 +3,8 @@ import { createGlobalStyle } from 'styled-components';
 import reset from 'styled-reset';
 
 const GlobalStyle = createGlobalStyle`
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Merriweather:wght@700;900&display=swap');
+
   ${reset}
 
   * {
@@ -10,14 +12,12 @@ const GlobalStyle = createGlobalStyle`
   }
 
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-      sans-serif;
+    font-family: ${({ theme }) => theme.fonts.main};
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-color: ${({ theme }) => theme.colors.background};
     color: ${({ theme }) => theme.colors.text};
-    line-height: 1.5;
+    line-height: 1.6;
   }
 
   a {
