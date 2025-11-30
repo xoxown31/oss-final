@@ -40,145 +40,146 @@ const processChartData = (records) => {
 };
 
 const DashboardPage = () => {
+  const { user } = useAuth();
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState('endDate-desc');
-  const { user, dismissTutorial } = useAuth();
-  const debouncedSearchQuery = useDebounce(searchQuery, 300);
+  const [searchTerm, setSearchTerm] = useState('');
   const [showTutorial, setShowTutorial] = useState(false);
+  
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
   useEffect(() => {
-    setLoading(true);
-    getRecords(user.id)
-      .then((data) => {
+    const fetchData = async () => {
+      try {
+        const data = await getRecords(user.id);
         setRecords(data);
+        if (user.isNewUser) {
+          setShowTutorial(true);
+        }
+      } catch (error) {
+        console.error("Failed to fetch records", error);
+      } finally {
         setLoading(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        setLoading(false);
-      });
-    
-    // Show tutorial for new users
-    if (user && user.isNewUser) {
-      setShowTutorial(true);
-    }
-  }, [user]);
-
-  const handleCloseTutorial = () => {
-    setShowTutorial(false);
-    dismissTutorial();
-  };
-
-  const { totalBooks, averageRating } = useMemo(() => {
-    if (!records || records.length === 0) {
-      return { totalBooks: 0, averageRating: 'N/A' };
-    }
-    const ratedRecords = records.filter(r => r.userRating > 0);
-    const totalRating = ratedRecords.reduce((sum, r) => sum + r.userRating, 0);
-    const avgRating = ratedRecords.length > 0 ? (totalRating / ratedRecords.length).toFixed(1) : 'N/A';
-    return {
-      totalBooks: records.length,
-      averageRating: avgRating,
+      }
     };
+    fetchData();
+  }, [user.id, user.isNewUser]);
+
+  const filteredRecords = useMemo(() => {
+    if (!debouncedSearchTerm) return records;
+    return records.filter(record => 
+      record.title.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+      record.author.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+    );
+  }, [records, debouncedSearchTerm]);
+
+  const stats = useMemo(() => {
+    const totalBooks = records.length;
+    const totalPages = records.reduce((acc, r) => acc + (r.pageCount || 0), 0); // pageCount가 있다면
+    const averageRating = totalBooks > 0 
+      ? (records.reduce((acc, r) => acc + r.userRating, 0) / totalBooks).toFixed(1) 
+      : 0;
+    return { totalBooks, totalPages, averageRating };
   }, [records]);
-
-  const displayedRecords = useMemo(() => {
-    return records
-      .filter(record =>
-        record.title.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
-        record.author.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
-      )
-      .sort((a, b) => {
-        const [sortField, sortOrder] = sortBy.split('-');
-        if (!a[sortField] || !b[sortField]) return 0;
-        const valA = typeof a[sortField] === 'string' ? a[sortField].toLowerCase() : a[sortField];
-        const valB = typeof b[sortField] === 'string' ? b[sortField].toLowerCase() : b[sortField];
-
-        if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
-        if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
-        return 0;
-      });
-  }, [records, debouncedSearchQuery, sortBy]);
 
   const chartData = useMemo(() => processChartData(records), [records]);
 
-  return (
-    <>
-      <TutorialModal show={showTutorial} onClose={handleCloseTutorial} />
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-        <StatsContainer>
-          <StatCard icon={<FaBook />} title="Total Books Read" value={totalBooks} />
-          <StatCard icon={<FaStar />} title="Average Rating" value={averageRating} />
-        </StatsContainer>
-        <DashboardWrapper>
-          <ChartContainer>
-            <h2>Your Reading Activity</h2>
-            {loading ? <LoadingSpinner /> : (
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis allowDecimals={false} />
-                  <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #ccc' }}/>
-                  <Legend />
-                  <Bar dataKey="books" fill="#8884d8" name="Books Read" barSize={30} />
-                </BarChart>
-              </ResponsiveContainer>
-            )}
-          </ChartContainer>
-          
-          <RecordsSection>
-            <Toolbar>
-              <SearchWrapper>
-                <FaSearch />
-                <SearchInput 
-                  type="text"
-                  placeholder="Search your records..."
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                />
-              </SearchWrapper>
-              <SortSelect value={sortBy} onChange={e => setSortBy(e.target.value)}>
-                <option value="endDate-desc">Sort by Date (Newest)</option>
-                <option value="endDate-asc">Sort by Date (Oldest)</option>
-                <option value="userRating-desc">Sort by Rating (Highest)</option>
-                <option value="userRating-asc">Sort by Rating (Lowest)</option>
-                <option value="title-asc">Sort by Title (A-Z)</option>
-                <option value="author-asc">Sort by Author (A-Z)</option>
-              </SortSelect>
-            </Toolbar>
-            <RecordList records={displayedRecords} loading={loading} />
-          </RecordsSection>
+  if (loading) return <LoadingSpinner />;
 
-        </DashboardWrapper>
-      </motion.div>
-      <FloatingActionButton to="/add-record">+</FloatingActionButton>
-    </>
+  return (
+    <Wrapper
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+    >
+      <Header variants={itemVariants}>
+        <h1>My Library</h1>
+        <p>Welcome back, {user.username}!</p>
+      </Header>
+
+      <StatsGrid>
+        <motion.div variants={itemVariants}>
+          <StatCard icon={<FaBook />} title="Total Books" value={stats.totalBooks} color="#4e54c8" />
+        </motion.div>
+        <motion.div variants={itemVariants}>
+          <StatCard icon={<FaBook />} title="Read Books" value={stats.totalBooks} color="#11998e" />
+        </motion.div>
+        <motion.div variants={itemVariants}>
+          <StatCard icon={<FaStar />} title="Avg Rating" value={stats.averageRating} color="#f2994a" />
+        </motion.div>
+      </StatsGrid>
+
+      {records.length > 0 && (
+        <ChartSection variants={itemVariants}>
+          <h2>Reading Activity</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis allowDecimals={false} />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="count" fill="#8f94fb" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartSection>
+      )}
+
+      <RecordsSection variants={itemVariants}>
+        <Toolbar>
+          <h2>Recent Records</h2>
+          <SearchWrapper>
+            <FaSearch />
+            <SearchInput 
+              type="text" 
+              placeholder="Search your library..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </SearchWrapper>
+        </Toolbar>
+        <RecordList records={filteredRecords} />
+      </RecordsSection>
+
+      <FloatingActionButton />
+      {showTutorial && <TutorialModal onClose={() => setShowTutorial(false)} />}
+    </Wrapper>
   );
 };
 
-const StatsContainer = styled.div`
-  display: flex;
-  gap: ${({ theme }) => theme.spacing.large};
-  margin-bottom: ${({ theme }) => theme.spacing.large};
-`;
-
-const DashboardWrapper = styled.div`
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: ${({ theme }) => theme.spacing.large};
-`;
-
-const ChartContainer = styled.div`
-  background: ${({ theme }) => theme.colors.card};
+const Wrapper = styled(motion.div)`
+  max-width: 1200px;
+  margin: 0 auto;
   padding: ${({ theme }) => theme.spacing.large};
+`;
+
+const Header = styled(motion.div)`
+  margin-bottom: ${({ theme }) => theme.spacing.xlarge};
+  h1 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: ${({ theme }) => theme.colors.primary};
+  }
+  p {
+    font-size: 1.2rem;
+    color: ${({ theme }) => theme.colors.gray};
+  }
+`;
+
+const StatsGrid = styled(motion.div)`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: ${({ theme }) => theme.spacing.large};
+  margin-bottom: ${({ theme }) => theme.spacing.xlarge};
+`;
+
+const ChartSection = styled(motion.div)`
+  background: ${({ theme }) => theme.colors.card};
   border-radius: ${({ theme }) => theme.borderRadius};
   box-shadow: ${({ theme }) => theme.shadows.small};
-  min-height: 360px;
-  display: flex;
-  flex-direction: column;
+  padding: ${({ theme }) => theme.spacing.large};
+  margin-bottom: ${({ theme }) => theme.spacing.xlarge};
 
   h2 {
     font-size: 1.4rem;
@@ -188,14 +189,14 @@ const ChartContainer = styled.div`
   }
 `;
 
-const RecordsSection = styled.div`
+const RecordsSection = styled(motion.div)`
   background: ${({ theme }) => theme.colors.card};
   border-radius: ${({ theme }) => theme.borderRadius};
   box-shadow: ${({ theme }) => theme.shadows.small};
   padding: ${({ theme }) => theme.spacing.large};
 `;
 
-const Toolbar = styled.div`
+const Toolbar = styled(motion.div)`
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -204,7 +205,7 @@ const Toolbar = styled.div`
   gap: ${({ theme }) => theme.spacing.medium};
 `;
 
-const SearchWrapper = styled.div`
+const SearchWrapper = styled(motion.div)`
   display: flex;
   align-items: center;
   gap: ${({ theme }) => theme.spacing.medium};
@@ -233,5 +234,19 @@ const SortSelect = styled.select`
   background: transparent;
   font-size: 1rem;
 `;
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { 
+    opacity: 1,
+    transition: { staggerChildren: 0.1 }
+  },
+  exit: { opacity: 0, y: -30, transition: { duration: 0.3 } }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 30 }, 
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } 
+};
 
 export default DashboardPage;

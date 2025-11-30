@@ -8,6 +8,7 @@ import BookSearch from '../components/BookSearch';
 import StarRating from '../components/StarRating';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { DEFAULT_PROFILE_IMAGE_URL } from '../constants';
+import { motion } from 'framer-motion';
 
 // Helper function to validate and get profile image URL
 const getValidProfileImageUrl = (url) => {
@@ -91,7 +92,12 @@ const AddRecordPage = () => {
   }
 
   return (
-    <Wrapper>
+    <Wrapper
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -30 }}
+      transition={{ duration: 0.5 }}
+    >
       <Header>
         <h1>Add a New Record</h1>
         <p>Search for a book and add your thoughts.</p>
@@ -169,7 +175,7 @@ const AddRecordPage = () => {
 };
 
 // ... styled components from before, with additions
-const Wrapper = styled.div`
+const Wrapper = styled(motion.div)`
   max-width: 800px;
   margin: 0 auto;
   padding: ${({ theme }) => theme.spacing.large};
@@ -178,7 +184,7 @@ const Wrapper = styled.div`
   box-shadow: ${({ theme }) => theme.shadows.small};
 `;
 
-const Header = styled.div`
+const Header = styled(motion.div)`
   text-align: center;
   margin-bottom: ${({ theme }) => theme.spacing.large};
   h1 {
@@ -197,7 +203,7 @@ const Form = styled.form`
   gap: ${({ theme }) => theme.spacing.large};
 `;
 
-const SelectedBook = styled.div`
+const SelectedBook = styled(motion.div)`
   display: flex;
   gap: ${({ theme }) => theme.spacing.medium};
   padding: ${({ theme }) => theme.spacing.medium};
@@ -221,7 +227,7 @@ const CoverImage = styled.img`
   border-radius: 4px;
 `;
 
-const FormSection = styled.div`
+const FormSection = styled(motion.div)`
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing.small};
@@ -249,12 +255,12 @@ const TextArea = styled.textarea`
   min-height: 100px;
 `;
 
-const DateFields = styled.div`
+const DateFields = styled(motion.div)`
   display: flex;
   gap: ${({ theme }) => theme.spacing.medium};
 `;
 
-const ButtonContainer = styled.div`
+const ButtonContainer = styled(motion.div)`
   display: flex;
   gap: ${({ theme }) => theme.spacing.medium};
   margin-top: ${({ theme }) => theme.spacing.medium};
@@ -277,7 +283,7 @@ const Button = styled.button`
   }
 `;
 
-const ToggleWrapper = styled.div`
+const ToggleWrapper = styled(motion.div)`
   display: flex;
   align-items: center;
   justify-content: space-between;

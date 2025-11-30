@@ -39,13 +39,15 @@ const Sidebar = () => {
           <span>Settings</span>
         </StyledNavLink>
             </Nav>
-      
+            
+            {/*
             <DevToolsSection>
               <StyledNavLink to="/dev">
                 <FaWrench />
                 <span>Dev Tools</span>
               </StyledNavLink>
             </DevToolsSection>
+            */}
       
             <LogoutButton onClick={handleLogout}>
               <FaSignOutAlt />

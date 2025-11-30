@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { getPublicRecords } from '../api';
 import LoadingSpinner from '../components/LoadingSpinner';
 import UserProfileModal from '../components/UserProfileModal';
 import { DEFAULT_PROFILE_IMAGE_URL } from '../constants';
-import { useAuth } from '../contexts/AuthContext'; // Import useAuth
+import { useAuth } from '../contexts/AuthContext';
 
 const CommunityPage = () => {
   const [publicRecords, setPublicRecords] = useState([]);
@@ -13,10 +13,9 @@ const CommunityPage = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
-  const { user } = useAuth(); // Get the user from AuthContext
+  const { user } = useAuth();
 
   useEffect(() => {
-    // Re-fetch public records when the current user's ID changes
     getPublicRecords()
       .then(data => {
         const sortedData = data.sort((a, b) => {
@@ -32,7 +31,7 @@ const CommunityPage = () => {
         console.error(err);
         setLoading(false);
       });
-  }, [user?.id]); // Add user.id to the dependency array
+  }, [user?.id]);
 
   const handleUserClick = (user) => {
     setSelectedUser(user);
@@ -45,7 +44,12 @@ const CommunityPage = () => {
   };
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+    <Wrapper 
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -30 }}
+      transition={{ duration: 0.5 }}
+    >
       <Header>
         <h1>Community Feed</h1>
         <p>See what others in the Bookend community are reading.</p>
@@ -79,6 +83,7 @@ const CommunityPage = () => {
                     }
                     alt={record.username}
                     onClick={() => handleUserClick({
+                      id: record.userid, 
                       username: record.username,
                       profileImageUrl: record.userProfileImageUrl && (record.userProfileImageUrl.startsWith('http') || record.userProfileImageUrl.startsWith('https'))
                         ? record.userProfileImageUrl
@@ -86,6 +91,7 @@ const CommunityPage = () => {
                     })}
                   />
                   Shared by <Username onClick={() => handleUserClick({
+                    id: record.userid,
                     username: record.username,
                     profileImageUrl: record.userProfileImageUrl && (record.userProfileImageUrl.startsWith('http') || record.userProfileImageUrl.startsWith('https'))
                       ? record.userProfileImageUrl
@@ -97,12 +103,20 @@ const CommunityPage = () => {
           ))}
         </Grid>
       )}
-      {isProfileModalOpen && <UserProfileModal user={selectedUser} onClose={handleCloseModal} />}
-    </motion.div>
+      <AnimatePresence>
+        {isProfileModalOpen && <UserProfileModal user={selectedUser} onClose={handleCloseModal} />}
+      </AnimatePresence>
+    </Wrapper>
   );
 };
 
-const Header = styled.div`
+const Wrapper = styled(motion.div)`
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: ${({ theme }) => theme.spacing.large};
+`;
+
+const Header = styled(motion.div)`
   margin-bottom: ${({ theme }) => theme.spacing.xlarge};
   h1 {
     font-size: 2.5rem;
@@ -115,7 +129,7 @@ const Header = styled.div`
   }
 `;
 
-const Grid = styled.div`
+const Grid = styled(motion.div)`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: ${({ theme }) => theme.spacing.large};
@@ -142,7 +156,7 @@ const CoverImage = styled.img`
   object-fit: cover;
 `;
 
-const CardContent = styled.div`
+const CardContent = styled(motion.div)`
   padding: ${({ theme }) => theme.spacing.medium};
   display: flex;
   flex-direction: column;
@@ -160,7 +174,7 @@ const Author = styled.p`
   margin-bottom: ${({ theme }) => theme.spacing.medium};
 `;
 
-const Rating = styled.div`
+const Rating = styled(motion.div)`
   color: ${({ theme }) => theme.colors.accent};
   margin-bottom: ${({ theme }) => theme.spacing.medium};
 `;
@@ -173,7 +187,7 @@ const Notes = styled.p`
   white-space: pre-wrap;
 `;
 
-const UserInfo = styled.div`
+const UserInfo = styled(motion.div)`
   font-size: 0.8rem;
   font-weight: bold;
   color: ${({ theme }) => theme.colors.gray};
@@ -192,6 +206,7 @@ const ProfileImage = styled.img`
   border-radius: 50%;
   object-fit: cover;
   margin-right: ${({ theme }) => theme.spacing.small};
+  cursor: pointer;
 `;
 
 const Username = styled.span`

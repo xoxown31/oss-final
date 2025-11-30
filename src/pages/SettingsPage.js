@@ -37,24 +37,31 @@ const SettingsPage = () => {
   };
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-      <Header>
-        {console.log(user)}
-        <h1>Settings</h1>
-        <p>Update your profile information.</p>
-      </Header>
-      <Form>
-        <label htmlFor="profileImageUrl">Profile Image URL</label>
-        <Input
-          id="profileImageUrl"
-          type="text"
-          value={profileImageUrl}
-          onChange={(e) => setProfileImageUrl(e.target.value)}
-        />
-        <Button onClick={handleSave}>Save</Button>
-        {message && <p>{message}</p>}
-      </Form>
-    </motion.div>
+    <Wrapper
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -30 }}
+      transition={{ duration: 0.5 }}
+    >
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+        <Header>
+          {console.log(user)}
+          <h1>Settings</h1>
+          <p>Update your profile information.</p>
+        </Header>
+        <Form>
+          <label htmlFor="profileImageUrl">Profile Image URL</label>
+          <Input
+            id="profileImageUrl"
+            type="text"
+            value={profileImageUrl}
+            onChange={(e) => setProfileImageUrl(e.target.value)}
+          />
+          <Button onClick={handleSave}>Save</Button>
+          {message && <p>{message}</p>}
+        </Form>
+      </motion.div>
+    </Wrapper>
   );
 };
 
@@ -88,6 +95,12 @@ const Button = styled.button`
   color: white;
   border: none;
   cursor: pointer;
+`;
+
+const Wrapper = styled(motion.div)`
+  max-width: 800px;
+  margin: 0 auto;
+  padding: ${({ theme }) => theme.spacing.large};
 `;
 
 export default SettingsPage;

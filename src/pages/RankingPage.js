@@ -60,8 +60,14 @@ const calculateRankings = (records) => {
   return { hot, mostRead, topRated };
 };
 
+const pageVariants = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  exit: { opacity: 0, y: -20, transition: { duration: 0.5 } }
+};
+
 const RankingPage = () => {
-  const [records, setRecords] = useState([]);
+  const [rankings, setRankings] = useState({ hot: [], mostRead: [], topRated: [] });
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('hot');
 
@@ -69,7 +75,8 @@ const RankingPage = () => {
     setLoading(true);
     getPublicRecords()
       .then(data => {
-        setRecords(data);
+        const calculated = calculateRankings(data);
+        setRankings(calculated);
         setLoading(false);
       })
       .catch(err => {
@@ -78,41 +85,68 @@ const RankingPage = () => {
       });
   }, []);
 
-  const rankings = useMemo(() => calculateRankings(records), [records]);
+  if (loading) return <LoadingSpinner />;
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+    <Wrapper
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      variants={pageVariants}
+    >
       <Header>
-        <h1>Community Rankings</h1>
-        <p>Discover books that are popular, highly-rated, and trending now.</p>
+        <h1>Rankings</h1>
+        <p>Top books in the community.</p>
       </Header>
-      
+
       <Tabs>
-        <TabButton active={activeTab === 'hot'} onClick={() => setActiveTab('hot')}>Hot</TabButton>
-        <TabButton active={activeTab === 'mostRead'} onClick={() => setActiveTab('mostRead')}>Most Read</TabButton>
-        <TabButton active={activeTab === 'topRated'} onClick={() => setActiveTab('topRated')}>Top Rated</TabButton>
+        <TabButton 
+          active={activeTab === 'hot'} 
+          onClick={() => setActiveTab('hot')}
+        >
+          🔥 Hot
+        </TabButton>
+        <TabButton 
+          active={activeTab === 'mostRead'} 
+          onClick={() => setActiveTab('mostRead')}
+        >
+          📖 Most Read
+        </TabButton>
+        <TabButton 
+          active={activeTab === 'topRated'} 
+          onClick={() => setActiveTab('topRated')}
+        >
+          ⭐ Top Rated
+        </TabButton>
       </Tabs>
-      
-      {loading ? <LoadingSpinner /> : (
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTab}
-            initial={{ y: 10, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -10, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            {activeTab === 'hot' && <RankingList title="Trending Now" books={rankings.hot} metric="hotScore" />}
-            {activeTab === 'mostRead' && <RankingList title="All-Time Most Read" books={rankings.mostRead} metric="readCount" />}
-            {activeTab === 'topRated' && <RankingList title="Community Top Rated" books={rankings.topRated} metric="averageRating" />}
-          </motion.div>
-        </AnimatePresence>
-      )}
-    </motion.div>
+
+      <AnimatePresence mode="wait">
+        <ContentWrapper
+          key={activeTab}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.3 }}
+        >
+          {activeTab === 'hot' && <RankingList title="Trending Now" books={rankings.hot} metric="hotScore" />}
+          {activeTab === 'mostRead' && <RankingList title="All-Time Most Read" books={rankings.mostRead} metric="readCount" />}
+          {activeTab === 'topRated' && <RankingList title="Community Top Rated" books={rankings.topRated} metric="averageRating" />}
+        </ContentWrapper>
+      </AnimatePresence>
+    </Wrapper>
   );
 };
 
-const Header = styled.div`
+const Wrapper = styled(motion.div)`
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: ${({ theme }) => theme.spacing.large};
+`;
+
+const ContentWrapper = styled(motion.div)`
+`;
+
+const Header = styled(motion.div)`
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -121,7 +155,7 @@ const Header = styled.div`
   p { font-size: 1.2rem; color: ${({ theme }) => theme.colors.gray}; }
 `;
 
-const Tabs = styled.div`
+const Tabs = styled(motion.div)`
   display: flex;
   gap: ${({ theme }) => theme.spacing.medium};
   margin-bottom: ${({ theme }) => theme.spacing.large};
