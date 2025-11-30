@@ -59,9 +59,8 @@ const RecordPage = () => {
   const handleDelete = async () => {
     if (window.confirm('Are you sure you want to delete this record?')) {
       try {
-        await deleteRecord(id);
-        navigate('/');
-      } catch (error) {
+              await deleteRecord(id);
+              navigate('/dashboard');      } catch (error) {
         console.error('Failed to delete record', error);
       }
     }

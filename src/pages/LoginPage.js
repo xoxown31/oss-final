@@ -13,7 +13,7 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const from = location.state?.from?.pathname || '/';
+  const from = location.state?.from?.pathname || '/dashboard';
   const registrationMessage = location.state?.message;
 
   const handleSubmit = async (e) => {

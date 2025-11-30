@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getPublicRecords } from '../api';
-import { generateDemoData } from '../api/demoData';
 import LoadingSpinner from '../components/LoadingSpinner';
 import RankingList from '../components/RankingList';
 
@@ -64,10 +63,9 @@ const calculateRankings = (records) => {
 const RankingPage = () => {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isGenerating, setIsGenerating] = useState(false);
   const [activeTab, setActiveTab] = useState('hot');
 
-  const fetchAndSetRecords = () => {
+  useEffect(() => {
     setLoading(true);
     getPublicRecords()
       .then(data => {
@@ -78,36 +76,15 @@ const RankingPage = () => {
         console.error(err);
         setLoading(false);
       });
-  };
-
-  useEffect(() => {
-    fetchAndSetRecords();
   }, []);
-
-  const handleGenerateData = async () => {
-    setIsGenerating(true);
-    const result = await generateDemoData();
-    if (result.success) {
-      alert('Demo data generation complete! The rankings will now refresh.');
-      fetchAndSetRecords(); // Re-fetch data to update the view
-    } else {
-      alert('Failed to generate demo data. Please check the console.');
-    }
-    setIsGenerating(false);
-  };
 
   const rankings = useMemo(() => calculateRankings(records), [records]);
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
       <Header>
-        <div>
-          <h1>Community Rankings</h1>
-          <p>Discover books that are popular, highly-rated, and trending now.</p>
-        </div>
-        <GenerateButton onClick={handleGenerateData} disabled={isGenerating}>
-          {isGenerating ? 'Generating...' : 'Generate Demo Data'}
-        </GenerateButton>
+        <h1>Community Rankings</h1>
+        <p>Discover books that are popular, highly-rated, and trending now.</p>
       </Header>
       
       <Tabs>

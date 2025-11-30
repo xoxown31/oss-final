@@ -71,7 +71,7 @@ const AddRecordPage = () => {
 
     try {
       await createRecord(newRecord);
-      navigate('/');
+      navigate('/dashboard');
     } catch (error) {
       console.error('Failed to create record:', error);
     }

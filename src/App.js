@@ -15,6 +15,10 @@ import CommunityPage from './pages/CommunityPage';
 
 // ... other imports
 
+import HomePage from './pages/HomePage';
+
+import DevPage from './pages/DevPage';
+
 function App() {
   const location = useLocation();
 
@@ -22,15 +26,17 @@ function App() {
     <AuthProvider>
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           
           <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
-            <Route path="/" element={<DashboardPage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/add-record" element={<AddRecordPage />} />
             <Route path="/record/:id" element={<RecordPage />} />
             <Route path="/community" element={<CommunityPage />} />
             <Route path="/ranking" element={<RankingPage />} />
+            <Route path="/dev" element={<DevPage />} />
           </Route>
         </Routes>
       </AnimatePresence>
